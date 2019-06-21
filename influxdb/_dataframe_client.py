@@ -388,10 +388,8 @@ class DataFrameClient(InfluxDBClient):
                                              datatype='field')
 
         field_df = (field_df.columns.values + '=').tolist() + field_df
-        field_df[field_df.columns[1:]] = ',' + field_df[
-            field_df.columns[1:]]
-        field_df = field_df.where(~mask_null, '')  # drop Null entries
-        fields = field_df.sum(axis=1)
+        field_df = field_df.where(~mask_null, None)  # drop Null entries
+        fields = field_df.apply(lambda r: r.str.cat(sep = ","), axis = 1)
         del field_df
 
         # Generate line protocol string
